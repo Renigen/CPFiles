@@ -5,7 +5,7 @@
 */
 
 //Global Variables
-//String, Tokenize, and Directory respectively
+//String, tokenize, and Directory respectively
 #define S_BUFFER 129
 #define T_BUFFER 4
 #define D_BUFFER 1024
@@ -25,11 +25,13 @@ char string[S_BUFFER];
 
 
 //returns length of array
-int lenArgs(char** args) {
+int lenArgs(char** args)
+{
 	char* 	arg = args[0];
 	int 	length = 0;
 
-	while (arg != NULL) {
+	while (arg != NULL)
+    {
 		arg = args[++length];
 	}
 
@@ -37,15 +39,18 @@ int lenArgs(char** args) {
 }
 
 
-// Scan array for str and return index
-int contains(char** args, char* str) {
+// Scan array for string and return index
+int scanFor(char** args, char* string)
+{
 	char* 	arg = args[0];
-	int	pos = 0;
+	int	pos = 0; //change to pos, position is a bit long
 
-	while (arg != NULL) {
-		if (strcmp(arg, str) == 0)
+	while (arg != NULL)
+    {
+        //compare arg to string
+		if (strcmp(arg, string) == 0)
 			return pos;
-
+        //increment position
 		arg = args[++pos];
 	}
 
@@ -53,22 +58,25 @@ int contains(char** args, char* str) {
 }
 
 // Display prompt then read input line
-char* input(char* prompt) {
-	printf("%s ~ ", cwd);
+char* input(char* prompt)
+{
+	printf("%s %s", cwd, prompt);
 
-	fgets(str, S_BUFFER, stdin);
-	str[strcspn(str, "\n")] = 0; // remove newline
+	fgets(string, S_BUFFER, stdin);
+	string[strcspn(string, "\n")] = 0; // removes the new line
 
-	return str;
+	return string;
 }
 
-char** tokenize(char* line) {
+char** tok(char* line)
+{
 	int 	buffer 	= T_BUFFER;
 	int 	pos 	= 0;
 	char** 	tokens	= malloc(buffer * sizeof(char*)); // allocate new array
 	char* 	token;
 
-	if (!tokens) {
+	if (!tokens)
+    {
 		fprintf(stderr, "malloc error\n");
 		exit(EXIT_FAILURE);
 	}
@@ -80,11 +88,13 @@ char** tokenize(char* line) {
 		pos++;
 
 		// array is bigger than buffer, reallocate
-		if (pos >= buffer) {
+		if (pos >= buffer)
+        {
 			buffer += T_BUFFER;
 			tokens = realloc(tokens, buffer * sizeof(char*));
 
-			if (!tokens) {
+			if (!tokens)
+            {
 				fprintf(stderr, "malloc error\n");
 				exit(EXIT_FAILURE);
 			}
@@ -98,8 +108,9 @@ char** tokenize(char* line) {
 }
 
 // Redirect output
-void oredirect(char** args, int oindex) {
-	int fp = open(args[oindex + 1],
+void outredirect(char** args, int outIndex)
+{
+	int fp = open(args[outIndex + 1],
 			O_WRONLY | O_CREAT | O_TRUNC,
 			S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
 
@@ -108,19 +119,20 @@ void oredirect(char** args, int oindex) {
 
 	close(fp);
 
-	args[oindex] = NULL;
+	args[outIndex] = NULL;
 }
 
 // Redirect input
-void iredirect(char** args, int iindex) {
-	int fp = open(args[iindex + 1], O_RDONLY);
+void inredirect(char** args, int inIndex)
+{
+	int fp = open(args[inIndex + 1], O_RDONLY);
 
 	if (dup2(fp, STDIN_FILENO) == -1)
 		perror("dup2 in");
 
 	close(fp);
 
-	args[iindex] = NULL;
+	args[inIndex] = NULL;
 }
 
 //recomment and revisit
@@ -129,9 +141,9 @@ int splice(char** args)
     pid_t   pid1;
     pid_t   pid2;
 
-    int status;
-    int oindex; //change to outIndex, just an o is confusing
-    int iindex; //change to inIndex, just an i is confusing
+    int stat;
+    int outIndex; //change to outIndex, just an o is confusing
+    int inIndex; //change to inIndex, just an i is confusing
 
     pid1 = fork();
     if (pid1 == 0)
@@ -139,14 +151,14 @@ int splice(char** args)
 		// child process
 
 		// check for redirect
-		if ((oindex = contains(args, ">")) != -1)
+		if ((outIndex = scanFor(args, ">")) != -1)
         {
-			oredirect(args, oindex);
+			outredirect(args, outIndex);
 		}
 
-		if ((iindex = contains(args, "<")) != -1)
+		if ((inIndex = scanFor(args, "<")) != -1)
         {
-			iredirect(args, iindex);
+			inredirect(args, inIndex);
 		}
 
 		// run command
@@ -165,7 +177,7 @@ int splice(char** args)
     else
     {
 		// parent process
-		if ((pid2 = waitpid(pid1, &status, WUNTRACED)) == -1) {
+		if ((pid2 = waitpid(pid1, &stat, WUNTRACED)) == -1) {
 			perror("waitpid");
 			exit(EXIT_FAILURE);
 		}
@@ -185,7 +197,7 @@ int printcwd()
 
     else
     {
-        printf("%s\n", cwd);
+        printf("Current working directory is: %s\n", cwd);
         return 1;
     }
 }
@@ -196,8 +208,8 @@ int cd(char* arg)
     //if chdir returns an error
     if (chdir(arg) != 0)
     {
-        printf("Directory not found.")
-        return -1
+        printf("Directory not found.");
+        return -1;
     }
     else
     {
@@ -247,7 +259,7 @@ int execute(char** args)
 
         else
         {
-            return printcwd()
+            return printcwd();
         }
     }
     //Start a new process
@@ -261,7 +273,7 @@ int main()
 {
     char**  args;
     char*   line;
-    int     status;
+    int     stat;
     getcwd(cwd, sizeof(cwd));
 
     do
@@ -269,9 +281,9 @@ int main()
 
         //Want to get the current directory before and during the loop.
         getcwd(cwd, sizeof(cwd));
-        line = input(" ~ ");
-        args = tokenize(line);
-        status = execute(args);
+        line = input("~ ");
+        args = tok(line);
+        stat = execute(args);
 
-    } while(status);
+    } while(stat);
 }
