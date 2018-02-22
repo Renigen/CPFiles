@@ -2,6 +2,8 @@
 ** Splice Shell
 ** Kristian Leopold
 ** 2/21/2018
+** A simple Shell
+** Named Splice Shell because I named the fork process "Splice"
 */
 
 //Global Variables
