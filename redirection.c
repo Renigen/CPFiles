@@ -3,6 +3,7 @@
 #include<string.h>
 #include<unistd.h>
 #include <sys/wait.h>
+
 char str[129];
 enum {NOT_FOUND=0,FOUND};
 enum {false=0,true};
@@ -12,26 +13,7 @@ int ReadLine(char *, int , FILE *);
 
 
 
-int splice()
-{
-  pid_t  pid;
-  /* fork another process */
-  pid = fork();
-  if (pid < 0) { /* error occurred */
-    fprintf(stderr, "Fork Failed");
-    exit(-1);
-  }
-  else if (pid == 0) { /* child process */
-    execlp("bin/ls", "ls", NULL);
-  }
-  else { /* parent process */
-    /* parent will wait for the child to complete */
-    printf ("\n Child Made\n");
-    wait (NULL);
-    printf ("\nChild Complete\n");
-    exit(0);
-  }
-}
+
 
 
 
@@ -81,6 +63,29 @@ char *mystrtok(char* string,const char *delim)
     }
   return p;
 }
+
+
+int splice()
+{
+  pid_t  pid;
+  /* fork another process */
+  pid = fork();
+  if (pid < 0) { /* error occurred */
+    fprintf(stderr, "Fork Failed");
+    exit(-1);
+  }
+  else if (pid == 0) { /* child process */
+    execlp("bin/ls", "ls", NULL);
+  }
+  else { /* parent process */
+    /* parent will wait for the child to complete */
+    printf ("\n Child Made\n");
+    wait (NULL);
+    printf ("\nChild Complete\n");
+    exit(0);
+  }
+}
+
 
 int main()
 {
@@ -144,7 +149,12 @@ int main()
         exit(3);
 
       else
-        printf("other placeholder\n");
+        {
+            splice();
+
+            printf("other placeholder\n");
+        }
+
     }
   }
 }
