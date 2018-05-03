@@ -23,6 +23,7 @@
 //Global Arrays
 char cwd[D_BUFFER];
 char string[S_BUFFER];
+//char var[];
 
 
 
@@ -144,8 +145,8 @@ int splice(char** args)
     pid_t   pid2;
 
     int stat;
-    int outIndex; //change to outIndex, just an o is confusing
-    int inIndex; //change to inIndex, just an i is confusing
+    int outIndex; //change to outIndex
+    int inIndex; //change to inIndex
 
     pid1 = fork();
     if (pid1 == 0)
@@ -228,7 +229,12 @@ int cd(char* arg)
         }
     }
 }
-
+/*
+int set(char x, char y, char z)
+{
+	x y = z
+}
+*/
 //change to exec, execute seems a bit long
 int execute(char** args)
 {
@@ -264,7 +270,46 @@ int execute(char** args)
             return printcwd();
         }
     }
-    //Start a new process
+
+/*	if (strcmp(args[0], "set") == 0)
+	{
+		if(args[1] == NULL)
+		{
+			printf("Variable type not specified.");
+			return -1;
+		}
+		else
+		{
+			char x = args[1];
+			return 1;
+		}
+
+
+		if(args[2] == NULL)
+		{
+			printf("Variable name not specified.");
+			return -1;
+		}
+		else
+		{
+			char y = args[2];
+			return 1;
+		}
+		if(args[3] == NULL)
+		{
+			printf("Variable value not specified.");
+			return -1;
+		}
+
+		else
+		{
+			char z = args[3];
+			return 1;
+
+
+		}
+	}
+*/    //Start a new process
     return splice(args);
 
 }
@@ -288,4 +333,6 @@ int main()
         stat = execute(args);
 
     } while(stat);
+
+	return 0;
 }
